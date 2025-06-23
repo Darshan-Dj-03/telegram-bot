@@ -107,6 +107,8 @@ async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(join_check_callback, pattern="check_join"))
+    import sys
+    print("Running on Python", sys.version)
     print("🤖 Bot running...")
     await app.run_polling()
 
