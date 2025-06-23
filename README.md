@@ -8,10 +8,8 @@ A Telegram bot that:
 
 ---
 
-## ✅ Local Setup
+## ✅ what i need to do 
 
-```bash
-git clone https://github.com/yourusername/telegram-video-bot.git
-cd telegram-video-bot
-pip install -r requirements.txt
-```
+-- deploy the code 
+-------use fly.io to deploy 
+-------need a credit card to get account  
