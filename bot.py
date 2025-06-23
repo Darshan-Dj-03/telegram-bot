@@ -6,20 +6,15 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
 load_dotenv()
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# Required channel usernames
 REQUIRED_CHANNELS = ["@the_traitors_s1", "@web_series_devil"]
 
-# Load episode data from JSON
 with open("episodes.json", "r") as f:
     EPISODE_DATA = json.load(f)
 
-# Store user requests temporarily
 user_requests = {}
 
-# Check if user is in all required channels
 async def is_user_subscribed(user_id, context):
     for channel in REQUIRED_CHANNELS:
         try:
@@ -30,7 +25,6 @@ async def is_user_subscribed(user_id, context):
             return False
     return True
 
-# /start command handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     user_id = update.effective_user.id
@@ -39,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❗ Invalid access. Please click a valid episode button from the channel.")
         return
 
-    episode_quality = args[0]  # e.g., 'ep1_720p'
+    episode_quality = args[0]
     user_requests[user_id] = episode_quality
 
     if await is_user_subscribed(user_id, context):
@@ -52,7 +46,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(buttons)
         )
 
-# Callback when "I’ve Joined" is clicked
 async def join_check_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
@@ -87,7 +80,6 @@ async def join_check_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=InlineKeyboardMarkup(updated_buttons)
         )
 
-# Function to send video
 async def send_video(user_id, context):
     payload = user_requests.get(user_id)
     if not payload:
@@ -102,15 +94,16 @@ async def send_video(user_id, context):
         print(f"Error sending video: {e}")
         await context.bot.send_message(chat_id=user_id, text="⚠️ Could not find the requested video.")
 
-# Main entry using asyncio
-async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(join_check_callback, pattern="check_join"))
+def main():
     import sys
     print("Running on Python", sys.version)
     print("🤖 Bot running...")
-    await app.run_polling()
+
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(join_check_callback, pattern="check_join"))
+    
+    app.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
